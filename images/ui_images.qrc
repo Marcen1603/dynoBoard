@@ -1,0 +1,16 @@
+<RCC>
+  <qresource prefix="images">
+    <file>ui_images/branding_watermark_white_36dp.svg</file>
+    <file>ui_images/close_white_36dp.svg</file>
+    <file>ui_images/computer_white_36dp.svg</file>
+    <file>ui_images/explore_white_36dp.svg</file>
+    <file>ui_images/info_white_36dp.svg</file>
+    <file>ui_images/menu_white_36dp.svg</file>
+    <file>ui_images/minimize_white_36dp.svg</file>
+    <file>ui_images/public_white_36dp.svg</file>
+    <file>ui_images/sd_storage_white_36dp.svg</file>
+    <file>ui_images/settings_white_36dp.svg</file>
+    <file>ui_images/signal_wifi_statusbar_4_bar_white_36dp.svg</file>
+    <file>ui_images/thermostat_white_36dp.svg</file>
+  </qresource>
+</RCC>
