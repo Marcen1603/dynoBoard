@@ -1,10 +1,11 @@
 import sys
+import psutil
+import PySide2extn
 
-from PySide6 import *
-from PySide6 import QtGui
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsDropShadowEffect, QSizeGrip
+from PySide6 import QtGui, QtCore
+from PySide6.QtCore import QPropertyAnimation
+from PySide6.QtGui import QColor, Qt
+from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsDropShadowEffect, QSizeGrip, QPushButton
 
 from ui.ui_dynoDash import Ui_MainWindow
 
@@ -64,8 +65,89 @@ class MainWindow(QMainWindow):
                     e.accept()
 
         self.ui.header_frame.mouseMoveEvent = moveWindow
+        self.ui.open_close_side_bar_btn.clicked.connect(lambda: self.slideLeftMenu())
+
+        for w in self.ui.menu_frame.findChildren(QPushButton):
+            w.clicked.connect(self.applyButtonStyle)
+
+        self.cpu_ram()
 
         self.show()
+
+    def cpu_ram(self):
+
+        core = psutil.cpu_count()
+        self.ui.cpu_count.setText(str(core))
+
+        cpuPer = psutil.cpu_percent()
+        self.ui.cpu_per.setText(str(cpuPer) + ' %')
+
+        cpuMainCore = psutil.cpu_count(logical=False)
+        self.ui.cpu_main_core.setText(str(cpuMainCore))
+
+        self.ui.cpu_progress_bar.setRange(0, 100)
+        self.ui.cpu_progress_bar.setValue(int(cpuPer))
+        self.ui.label_cpu_progress_bar.setText(str(cpuPer))
+
+        totalRam = 1.0
+        totalRam = psutil.virtual_memory()[0] * totalRam
+        totalRam = totalRam / (1024 * 1024 * 1024)
+        self.ui.total_ram.setText(str("{:.4f}".format(totalRam) + ' GB'))
+
+        availRam = 1.0
+        availRam = psutil.virtual_memory()[1] * availRam
+        availRam = availRam / (1024 * 1024 * 1024)
+        self.ui.available_ram.setText(str("{:.4f}".format(availRam) + ' GB'))
+
+        ramUsed = 1.0
+        ramUsed = psutil.virtual_memory()[3] * ramUsed
+        ramUsed = ramUsed / (1024 * 1024 * 1024)
+        self.ui.used_ram.setText(str("{:.4f}".format(ramUsed) + ' GB'))
+
+        ramFree = 1.0
+        ramFree = psutil.virtual_memory()[4] * ramFree
+        ramFree = ramFree / (1024 * 1024 * 1024)
+        self.ui.free_ram.setText(str("{:.4f}".format(ramFree) + ' GB'))
+
+        ramUsage = str(psutil.virtual_memory()[2]) + '%'
+        self.ui.ram_usage.setText(str("{:.4f}").format(totalRam) + ' GB')
+
+        self.ui.ram_progress_bar.setRange(0, 100)
+        self.ui.ram_progress_bar.setValue(int(psutil.virtual_memory()[2]))
+        self.ui.label_ram_progress_bar.setText(str(psutil.virtual_memory()[2]))
+
+    def secs2hours(self, secs):
+        mm, ss = divmod(secs, 60)
+        hh, mm = divmod(mm, 60)
+        return "%d:%02d:%02d (H:M:S)" % (hh, mm, ss)
+
+    def applyButtonStyle(self):
+        for w in self.ui.menu_frame.findChildren(QPushButton):
+            if w.objectName() != self.sender().objectName():
+                w.setStyleSheet("border-bottom: none;")
+
+        self.sender().setStyleSheet("border-bottom: 2px solid")
+        return
+
+    def slideLeftMenu(self):
+        width = self.ui.left_menu_cont_frame.width()
+
+        # If minimized
+        if width == 55:
+            # Expand menu
+            newWidth = 250
+        # If maximized
+        else:
+            # Restore menu
+            newWidth = 55
+
+        # Animate the transition
+        self.animation = QPropertyAnimation(self.ui.left_menu_cont_frame, b"minimumWidth")
+        self.animation.setDuration(250)
+        self.animation.setStartValue(width)
+        self.animation.setEndValue(newWidth)
+        self.animation.setEasingCurve(QtCore.QEasingCurve.InOutQuart)
+        self.animation.start()
 
     def mousePressEvent(self, event):
         self.clickPosition = event.globalPos()
