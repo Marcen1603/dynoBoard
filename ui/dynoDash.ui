@@ -178,7 +178,7 @@
             </property>
             <property name="icon">
              <iconset resource="../images/ui_images.qrc">
-              <normaloff>:/images/ui_images/branding_watermark_white_36dp.svg</normaloff>:/images/ui_images/branding_watermark_white_36dp.svg</iconset>
+              <normaloff>:/images/ui_images/web_asset_white_36dp.svg</normaloff>:/images/ui_images/web_asset_white_36dp.svg</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -346,7 +346,7 @@
               <string>Übersicht</string>
              </property>
             </widget>
-            <widget class="QPushButton" name="fritzbox_button">
+            <widget class="QPushButton" name="internet_button">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -408,7 +408,7 @@
               </size>
              </property>
             </widget>
-            <widget class="QPushButton" name="netzwerk_button">
+            <widget class="QPushButton" name="network_button">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -439,7 +439,7 @@
               </size>
              </property>
             </widget>
-            <widget class="QPushButton" name="sensor_device">
+            <widget class="QPushButton" name="sensor_button">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -571,7 +571,7 @@
               <string notr="true">color: rgb(255, 255, 255);</string>
              </property>
              <property name="text">
-              <string>Fritzbox</string>
+              <string>Internet</string>
              </property>
             </widget>
             <widget class="QLabel" name="label_7">
@@ -733,10 +733,10 @@
           <item>
            <widget class="QStackedWidget" name="stackedWidget">
             <property name="currentIndex">
-             <number>2</number>
+             <number>6</number>
             </property>
             <widget class="QWidget" name="overview_page"/>
-            <widget class="QWidget" name="fritzbox_page"/>
+            <widget class="QWidget" name="internet_page"/>
             <widget class="QWidget" name="computer_page">
              <layout class="QVBoxLayout" name="verticalLayout_3">
               <item>
@@ -1540,7 +1540,7 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="netzwerk_page">
+            <widget class="QWidget" name="network_page">
              <layout class="QVBoxLayout" name="verticalLayout_13">
               <item>
                <widget class="QFrame" name="frame_13">

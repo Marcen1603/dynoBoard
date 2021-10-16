@@ -9,18 +9,19 @@
 ################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
+                            QMetaObject, QObject, QPoint, QRect,
+                            QSize, QTime, QUrl, Qt)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
+                           QFont, QFontDatabase, QGradient, QIcon,
+                           QImage, QKeySequence, QLinearGradient, QPainter,
+                           QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
-    QHeaderView, QLabel, QMainWindow, QPushButton,
-    QScrollArea, QSizePolicy, QStackedWidget, QTableWidget,
-    QTableWidgetItem, QVBoxLayout, QWidget)
+                               QHeaderView, QLabel, QMainWindow, QPushButton,
+                               QScrollArea, QSizePolicy, QStackedWidget, QTableWidget,
+                               QTableWidgetItem, QVBoxLayout, QWidget)
 import images.ui_images_rc
 import images.logo_rc
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -28,8 +29,8 @@ class Ui_MainWindow(object):
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1067, 600)
         MainWindow.setStyleSheet(u"* {\n"
-"	border: None;\n"
-"}")
+                                 "	border: None;\n"
+                                 "}")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.centralwidget.setStyleSheet(u"background-color: rgb(35, 35, 35);")
@@ -65,7 +66,6 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_4.addWidget(self.pushButton)
 
-
         self.horizontalLayout.addWidget(self.header_right_frame, 0, Qt.AlignLeft)
 
         self.header_center_frame = QFrame(self.header_frame)
@@ -91,8 +91,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_3.addWidget(self.label_2)
 
-
-        self.horizontalLayout.addWidget(self.header_center_frame, 0, Qt.AlignHCenter|Qt.AlignVCenter)
+        self.horizontalLayout.addWidget(self.header_center_frame, 0, Qt.AlignHCenter | Qt.AlignVCenter)
 
         self.header_right_frame_2 = QFrame(self.header_frame)
         self.header_right_frame_2.setObjectName(u"header_right_frame_2")
@@ -114,7 +113,7 @@ class Ui_MainWindow(object):
         self.restore_window_button = QPushButton(self.header_right_frame_2)
         self.restore_window_button.setObjectName(u"restore_window_button")
         icon2 = QIcon()
-        icon2.addFile(u":/images/ui_images/branding_watermark_white_36dp.svg", QSize(), QIcon.Normal, QIcon.Off)
+        icon2.addFile(u":/images/ui_images/web_asset_white_36dp.svg", QSize(), QIcon.Normal, QIcon.Off)
         self.restore_window_button.setIcon(icon2)
         self.restore_window_button.setIconSize(QSize(24, 24))
 
@@ -129,9 +128,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addWidget(self.close_winow_button, 0, Qt.AlignTop)
 
-
         self.horizontalLayout.addWidget(self.header_right_frame_2, 0, Qt.AlignRight)
-
 
         self.verticalLayout.addWidget(self.header_frame, 0, Qt.AlignTop)
 
@@ -180,15 +177,15 @@ class Ui_MainWindow(object):
         self.label_4.setGeometry(QRect(60, 17, 71, 16))
         self.label_4.setFont(font2)
         self.label_4.setStyleSheet(u"color: rgb(255, 255, 255);")
-        self.fritzbox_button = QPushButton(self.menu_frame)
-        self.fritzbox_button.setObjectName(u"fritzbox_button")
-        self.fritzbox_button.setGeometry(QRect(10, 60, 34, 30))
-        self.fritzbox_button.setFont(font2)
-        self.fritzbox_button.setStyleSheet(u"color: rgb(255, 255, 255);")
+        self.internet_button = QPushButton(self.menu_frame)
+        self.internet_button.setObjectName(u"internet_button")
+        self.internet_button.setGeometry(QRect(10, 60, 34, 30))
+        self.internet_button.setFont(font2)
+        self.internet_button.setStyleSheet(u"color: rgb(255, 255, 255);")
         icon5 = QIcon()
         icon5.addFile(u":/images/ui_images/public_white_36dp.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.fritzbox_button.setIcon(icon5)
-        self.fritzbox_button.setIconSize(QSize(30, 30))
+        self.internet_button.setIcon(icon5)
+        self.internet_button.setIconSize(QSize(30, 30))
         self.computer_button = QPushButton(self.menu_frame)
         self.computer_button.setObjectName(u"computer_button")
         self.computer_button.setGeometry(QRect(10, 110, 34, 30))
@@ -198,24 +195,25 @@ class Ui_MainWindow(object):
         icon6.addFile(u":/images/ui_images/computer_white_36dp.svg", QSize(), QIcon.Normal, QIcon.Off)
         self.computer_button.setIcon(icon6)
         self.computer_button.setIconSize(QSize(30, 30))
-        self.netzwerk_button = QPushButton(self.menu_frame)
-        self.netzwerk_button.setObjectName(u"netzwerk_button")
-        self.netzwerk_button.setGeometry(QRect(10, 310, 34, 30))
-        self.netzwerk_button.setFont(font2)
-        self.netzwerk_button.setStyleSheet(u"color: rgb(255, 255, 255);")
+        self.network_button = QPushButton(self.menu_frame)
+        self.network_button.setObjectName(u"network_button")
+        self.network_button.setGeometry(QRect(10, 310, 34, 30))
+        self.network_button.setFont(font2)
+        self.network_button.setStyleSheet(u"color: rgb(255, 255, 255);")
         icon7 = QIcon()
-        icon7.addFile(u":/images/ui_images/signal_wifi_statusbar_4_bar_white_36dp.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.netzwerk_button.setIcon(icon7)
-        self.netzwerk_button.setIconSize(QSize(30, 30))
-        self.sensor_device = QPushButton(self.menu_frame)
-        self.sensor_device.setObjectName(u"sensor_device")
-        self.sensor_device.setGeometry(QRect(10, 260, 34, 30))
-        self.sensor_device.setFont(font2)
-        self.sensor_device.setStyleSheet(u"color: rgb(255, 255, 255);")
+        icon7.addFile(u":/images/ui_images/signal_wifi_statusbar_4_bar_white_36dp.svg", QSize(), QIcon.Normal,
+                      QIcon.Off)
+        self.network_button.setIcon(icon7)
+        self.network_button.setIconSize(QSize(30, 30))
+        self.sensor_button = QPushButton(self.menu_frame)
+        self.sensor_button.setObjectName(u"sensor_button")
+        self.sensor_button.setGeometry(QRect(10, 260, 34, 30))
+        self.sensor_button.setFont(font2)
+        self.sensor_button.setStyleSheet(u"color: rgb(255, 255, 255);")
         icon8 = QIcon()
         icon8.addFile(u":/images/ui_images/thermostat_white_36dp.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.sensor_device.setIcon(icon8)
-        self.sensor_device.setIconSize(QSize(30, 30))
+        self.sensor_button.setIcon(icon8)
+        self.sensor_button.setIconSize(QSize(30, 30))
         self.storage_button = QPushButton(self.menu_frame)
         self.storage_button.setObjectName(u"storage_button")
         self.storage_button.setGeometry(QRect(10, 210, 34, 30))
@@ -281,7 +279,6 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_9.addWidget(self.menu_frame)
 
-
         self.horizontalLayout_8.addWidget(self.left_menu_cont_frame)
 
         self.main_body_contents = QFrame(self.main_body_frame)
@@ -300,9 +297,9 @@ class Ui_MainWindow(object):
         self.overview_page = QWidget()
         self.overview_page.setObjectName(u"overview_page")
         self.stackedWidget.addWidget(self.overview_page)
-        self.fritzbox_page = QWidget()
-        self.fritzbox_page.setObjectName(u"fritzbox_page")
-        self.stackedWidget.addWidget(self.fritzbox_page)
+        self.internet_page = QWidget()
+        self.internet_page.setObjectName(u"internet_page")
+        self.stackedWidget.addWidget(self.internet_page)
         self.computer_page = QWidget()
         self.computer_page.setObjectName(u"computer_page")
         self.verticalLayout_3 = QVBoxLayout(self.computer_page)
@@ -358,7 +355,6 @@ class Ui_MainWindow(object):
         self.label_28.setStyleSheet(u"color: rgb(255, 255, 255);")
 
         self.gridLayout.addWidget(self.label_28, 0, 0, 1, 1)
-
 
         self.verticalLayout_3.addWidget(self.cpu_info_frame)
 
@@ -428,7 +424,6 @@ class Ui_MainWindow(object):
 
         self.gridLayout_2.addWidget(self.label_27, 4, 1, 1, 1)
 
-
         self.verticalLayout_3.addWidget(self.ram_info)
 
         self.stackedWidget.addWidget(self.computer_page)
@@ -458,7 +453,6 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_13.addWidget(self.label_29)
 
-
         self.verticalLayout_5.addWidget(self.frame_10, 0, Qt.AlignTop)
 
         self.frame_2 = QFrame(self.frame)
@@ -474,7 +468,6 @@ class Ui_MainWindow(object):
         self.label_30.setStyleSheet(u"color: rgb(255, 255, 255);")
 
         self.horizontalLayout_14.addWidget(self.label_30)
-
 
         self.verticalLayout_5.addWidget(self.frame_2, 0, Qt.AlignTop)
 
@@ -523,7 +516,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.addWidget(self.label_33)
 
-
         self.horizontalLayout_10.addWidget(self.frame_5)
 
         self.frame_7 = QFrame(self.frame_4)
@@ -552,9 +544,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_9.addWidget(self.label_34)
 
-
         self.horizontalLayout_10.addWidget(self.frame_7)
-
 
         self.horizontalLayout_12.addWidget(self.frame_4)
 
@@ -591,7 +581,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_7.addWidget(self.label_39)
 
-
         self.horizontalLayout_11.addWidget(self.frame_8)
 
         self.frame_9 = QFrame(self.frame_6)
@@ -618,15 +607,11 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_10.addWidget(self.label_41)
 
-
         self.horizontalLayout_11.addWidget(self.frame_9)
-
 
         self.horizontalLayout_12.addWidget(self.frame_6)
 
-
         self.verticalLayout_5.addWidget(self.frame_3)
-
 
         self.horizontalLayout_15.addWidget(self.frame)
 
@@ -686,7 +671,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_4.addWidget(self.tableWidget)
 
-
         self.verticalLayout_6.addWidget(self.frame_11)
 
         self.stackedWidget.addWidget(self.storage_page)
@@ -726,15 +710,14 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_12.addWidget(self.tableWidget_2)
 
-
         self.verticalLayout_11.addWidget(self.frame_12)
 
         self.stackedWidget.addWidget(self.sensor_page)
-        self.netzwerk_page = QWidget()
-        self.netzwerk_page.setObjectName(u"netzwerk_page")
-        self.verticalLayout_13 = QVBoxLayout(self.netzwerk_page)
+        self.network_page = QWidget()
+        self.network_page.setObjectName(u"network_page")
+        self.verticalLayout_13 = QVBoxLayout(self.network_page)
         self.verticalLayout_13.setObjectName(u"verticalLayout_13")
-        self.frame_13 = QFrame(self.netzwerk_page)
+        self.frame_13 = QFrame(self.network_page)
         self.frame_13.setObjectName(u"frame_13")
         self.frame_13.setFrameShape(QFrame.StyledPanel)
         self.frame_13.setFrameShadow(QFrame.Raised)
@@ -792,7 +775,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_16.addWidget(self.tableWidget_3)
 
-
         self.verticalLayout_15.addWidget(self.frame_14)
 
         self.frame_15 = QFrame(self.scrollAreaWidgetContents)
@@ -835,7 +817,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_17.addWidget(self.tableWidget_4)
 
-
         self.verticalLayout_15.addWidget(self.frame_15)
 
         self.frame_16 = QFrame(self.scrollAreaWidgetContents)
@@ -869,7 +850,6 @@ class Ui_MainWindow(object):
         self.tableWidget_5.horizontalHeader().setDefaultSectionSize(150)
 
         self.verticalLayout_18.addWidget(self.tableWidget_5)
-
 
         self.verticalLayout_15.addWidget(self.frame_16)
 
@@ -909,26 +889,22 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_19.addWidget(self.tableWidget_6)
 
-
         self.verticalLayout_15.addWidget(self.frame_17)
 
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
         self.verticalLayout_14.addWidget(self.scrollArea)
 
-
         self.verticalLayout_13.addWidget(self.frame_13)
 
-        self.stackedWidget.addWidget(self.netzwerk_page)
+        self.stackedWidget.addWidget(self.network_page)
         self.settings_page = QWidget()
         self.settings_page.setObjectName(u"settings_page")
         self.stackedWidget.addWidget(self.settings_page)
 
         self.verticalLayout_2.addWidget(self.stackedWidget)
 
-
         self.horizontalLayout_8.addWidget(self.main_body_contents)
-
 
         self.verticalLayout.addWidget(self.main_body_frame)
 
@@ -957,8 +933,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_7.addWidget(self.label)
 
-
-        self.horizontalLayout_5.addWidget(self.footer_left_frame, 0, Qt.AlignLeft|Qt.AlignBottom)
+        self.horizontalLayout_5.addWidget(self.footer_left_frame, 0, Qt.AlignLeft | Qt.AlignBottom)
 
         self.footer_right = QFrame(self.footer_frame)
         self.footer_right.setObjectName(u"footer_right")
@@ -971,7 +946,6 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_6.addWidget(self.pushButton_2)
 
-
         self.horizontalLayout_5.addWidget(self.footer_right)
 
         self.size_grip = QFrame(self.footer_frame)
@@ -983,7 +957,6 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_5.addWidget(self.size_grip, 0, Qt.AlignBottom)
 
-
         self.verticalLayout.addWidget(self.footer_frame, 0, Qt.AlignBottom)
 
         MainWindow.setCentralWidget(self.centralwidget)
@@ -992,8 +965,8 @@ class Ui_MainWindow(object):
 
         self.stackedWidget.setCurrentIndex(6)
 
-
         QMetaObject.connectSlotsByName(MainWindow)
+
     # setupUi
 
     def retranslateUi(self, MainWindow):
@@ -1006,14 +979,14 @@ class Ui_MainWindow(object):
         self.close_winow_button.setText("")
         self.overview_button.setText("")
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"\u00dcbersicht", None))
-        self.fritzbox_button.setText("")
+        self.internet_button.setText("")
         self.computer_button.setText("")
-        self.netzwerk_button.setText("")
-        self.sensor_device.setText("")
+        self.network_button.setText("")
+        self.sensor_button.setText("")
         self.storage_button.setText("")
         self.system_info_button.setText("")
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"PC", None))
-        self.label_6.setText(QCoreApplication.translate("MainWindow", u"Fritzbox", None))
+        self.label_6.setText(QCoreApplication.translate("MainWindow", u"Internet", None))
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"System Information", None))
         self.label_8.setText(QCoreApplication.translate("MainWindow", u"Sesnsoren", None))
         self.label_9.setText(QCoreApplication.translate("MainWindow", u"Speicher", None))
@@ -1135,4 +1108,3 @@ class Ui_MainWindow(object):
         self.label.setText(QCoreApplication.translate("MainWindow", u"Version 0.1 | Copyright Marcel Peplies", None))
         self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
     # retranslateUi
-

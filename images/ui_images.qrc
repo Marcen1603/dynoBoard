@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="images">
+    <file>ui_images/web_asset_white_36dp.svg</file>
     <file>ui_images/branding_watermark_white_36dp.svg</file>
     <file>ui_images/close_white_36dp.svg</file>
     <file>ui_images/computer_white_36dp.svg</file>
