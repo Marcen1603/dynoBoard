@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['C:\\Users\\Marcel\\dynoBoard'],
+             pathex=['C:\\Users\\Marcel\\dynoBoard\\dist'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -33,7 +33,7 @@ exe = EXE(pyz,
           disable_windowed_traceback=False,
           target_arch=None,
           codesign_identity=None,
-          entitlements_file=None , icon='images\\logo\\logo_ico.ico')
+          entitlements_file=None , icon='images\\logo\\logo.png')
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,

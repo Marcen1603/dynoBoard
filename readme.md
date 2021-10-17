@@ -23,6 +23,6 @@ Befehl: pyside6-uic dynoDash.ui -o ui_dynoDash.py
 
 Um die UI zu einer .exe zu überführen, wird der folgende Befehl ausgeführt.
 
-Befehl: pyinstaller --name="DynoDashboard" --windowed main.py
+Befehl: pyinstaller --name="DynoDashboard" i- "images/logo/logo_ico.ico" --windowed main.py
 
 Dieser Befehl wird auf der Ebene der main.py ausgeführt.
