@@ -1,16 +1,64 @@
+import datetime
+import platform
+import shutil
 import sys
+import threading
+
 import psutil
-import PySide2extn
 
 from PySide6 import QtGui, QtCore
-from PySide6.QtCore import QPropertyAnimation
+from PySide6.QtCore import QPropertyAnimation, QObject, QRunnable, QThreadPool, Signal, Slot, QTimer
 from PySide6.QtGui import QColor, Qt
-from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsDropShadowEffect, QSizeGrip, QPushButton
+from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsDropShadowEffect, QSizeGrip, QPushButton, \
+    QTableWidgetItem, QProgressBar
+
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from ui.ui_dynoDash import Ui_MainWindow
 
 # Import Qt-Material
 import qt_material
+
+platforms = {
+    'linux': 'Linux',
+    'linux1': 'Linux',
+    'linux2': 'Linux',
+    'darwin': 'OS X',
+    'win32': 'Windows'
+}
+
+
+# class WorkerSignals(QObject):
+#     finished = Signal()
+#     error = Signal(tuple)
+#     result = Signal(object)
+#     progress = Signal(int)
+#
+#
+# class Worker(QRunnable):
+#
+#     def __init__(self, fn, *args, **kwargs):
+#         super(Worker, self).__init__()
+#
+#         self.fn = fn
+#         self.args = args
+#         self.kwargs = kwargs
+#         self.signals = WorkerSignals()
+#
+#         self.kwargs['progress_callback'] = self.signals.progress
+#
+#     @Slot
+#     def run(self):
+#         try:
+#             result = self.fn(*self.args, **self.kwargs)
+#         except:
+#             traceback.print_exc()
+#             exctype, value = sys, sys.exc_info()[:2]
+#             self.signals.error.emit((exctype, value, traceback.format_exc()))
+#         else:
+#             self.signals.result.emit(result)
+#         finally:
+#             self.signals.finished.emit()
 
 
 class MainWindow(QMainWindow):
@@ -48,11 +96,13 @@ class MainWindow(QMainWindow):
         self.ui.overview_button.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.overview_page))
         self.ui.internet_button.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.internet_page))
         self.ui.computer_button.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.computer_page))
-        self.ui.system_info_button.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.system_info_page))
+        self.ui.system_info_button.clicked.connect(
+            lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.system_info_page))
         self.ui.storage_button.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.storage_page))
         self.ui.sensor_button.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.sensor_page))
         self.ui.network_button.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.network_page))
         self.ui.settings_button.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.settings_page))
+        self.ui.activity_button.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.activity_page))
 
         QSizeGrip(self.ui.size_grip)
 
@@ -70,9 +120,245 @@ class MainWindow(QMainWindow):
         for w in self.ui.menu_frame.findChildren(QPushButton):
             w.clicked.connect(self.applyButtonStyle)
 
-        self.cpu_ram()
+        # Start thread
+        self.threadpool = QThreadPool()
 
         self.show()
+
+        self.cpu_ram()
+        self.system_info()
+        self.processes()
+        self.storage()
+        self.sensors()
+        self.networks()
+
+        # sched = BackgroundScheduler()
+        # sched.add_job(self.cpu_ram, 'interval', seconds=2)
+        # sched.start()
+
+        import threading
+
+        def looper():
+            # i as interval in seconds
+            threading.Timer(1, looper).start()
+            # put your action here
+            self.cpu_ram()
+
+        # to start
+        looper()
+
+    # def dyno_thread(self):
+    #     worker = Worker(self.cpu_ram())
+    #
+    #     worker.signals.result.connect(self.print_output)
+    #     worker.signals.finished.connect(self.thread_complete)
+    #     worker.signals.progress.connect(self.progress_fn)
+    #
+    #     self.threadpool.start(worker)
+
+    # def print_output(self, s):
+    #     print(s)
+    #
+    # def thread_complete(self):
+    #     print("Thread complete!")
+    #
+    # def progress_fn(self, n):
+    #     print("%d%% done" % n)
+
+    def sensors(self):
+        if sys.platform == 'linux' or sys.platform == 'linux1' or sys.platform == 'linux2':
+            for x in psutil.sensors_temperatures():
+                for y in psutil.sensors_temperatures()[x]:
+                    rowPosition = self.ui.sensor_tableWidget.rowCount()
+                    self.ui.sensor_tableWidget.insertRow(rowPosition)
+
+                    self.create_table_widget(rowPosition, 0, x, "sensor_tableWidget")
+                    self.create_table_widget(rowPosition, 1, y.label, "sensor_tableWidget")
+                    self.create_table_widget(rowPosition, 2, str(y.current), "sensor_tableWidget")
+                    self.create_table_widget(rowPosition, 3, str(y.high), "sensor_tableWidget")
+                    self.create_table_widget(rowPosition, 4, str(y.critical), "sensor_tableWidget")
+
+                    temp_per = (y.current / y.high) * 100
+
+                    progressBar = QProgressBar(self.ui.sensor_tableWidget)
+                    progressBar.setObjectName(u"progressBar")
+                    progressBar.setValue(temp_per)
+                    self.ui.sensor_tableWidget.setCellWidget(rowPosition, 5, progressBar)
+        else:
+            global platforms
+
+            rowPosition = self.ui.sensor_tableWidget.rowCount()
+            self.ui.sensor_tableWidget.insertRow(rowPosition)
+
+            self.create_table_widget(rowPosition, 0, "Funktion nicht verfügbar auf " + platforms[sys.platform],
+                                     "sensor_tableWidget")
+            self.create_table_widget(rowPosition, 1, "N/A", "sensor_tableWidget")
+            self.create_table_widget(rowPosition, 2, "N/A", "sensor_tableWidget")
+            self.create_table_widget(rowPosition, 3, "N/A", "sensor_tableWidget")
+            self.create_table_widget(rowPosition, 4, "N/A", "sensor_tableWidget")
+
+    def networks(self):
+        # Net stats
+        for x in psutil.net_if_stats():
+            z = psutil.net_if_stats()
+
+            rowPosition = self.ui.net_stats_tableWidget.rowCount()
+            self.ui.net_stats_tableWidget.insertRow(rowPosition)
+
+            self.create_table_widget(rowPosition, 0, x, "net_stats_tableWidget")
+            self.create_table_widget(rowPosition, 1, str(z[x].isup), "net_stats_tableWidget")
+            self.create_table_widget(rowPosition, 2, str(z[x].duplex), "net_stats_tableWidget")
+            self.create_table_widget(rowPosition, 3, str(z[x].speed), "net_stats_tableWidget")
+            self.create_table_widget(rowPosition, 4, str(z[x].mtu), "net_stats_tableWidget")
+
+        # Net io counter
+        for x in psutil.net_io_counters(pernic=True):
+            z = psutil.net_io_counters(pernic=True)
+
+            rowPosition = self.ui.net_io_tableWidget.rowCount()
+            self.ui.net_io_tableWidget.insertRow(rowPosition)
+
+            self.create_table_widget(rowPosition, 0, x, "net_io_tableWidget")
+            self.create_table_widget(rowPosition, 1, str(z[x].bytes_sent), "net_io_tableWidget")
+            self.create_table_widget(rowPosition, 2, str(z[x].bytes_recv), "net_io_tableWidget")
+            self.create_table_widget(rowPosition, 3, str(z[x].packets_sent), "net_io_tableWidget")
+            self.create_table_widget(rowPosition, 4, str(z[x].packets_recv), "net_io_tableWidget")
+            self.create_table_widget(rowPosition, 5, str(z[x].errin), "net_io_tableWidget")
+            self.create_table_widget(rowPosition, 6, str(z[x].errout), "net_io_tableWidget")
+            self.create_table_widget(rowPosition, 7, str(z[x].dropin), "net_io_tableWidget")
+            self.create_table_widget(rowPosition, 8, str(z[x].dropout), "net_io_tableWidget")
+
+        # Net addresses
+        for x in psutil.net_if_addrs():
+            z = psutil.net_if_addrs()
+
+            for y in z[x]:
+                rowPosition = self.ui.net_addresses_tableWidget.rowCount()
+                self.ui.net_addresses_tableWidget.insertRow(rowPosition)
+
+                self.create_table_widget(rowPosition, 0, str(x), "net_addresses_tableWidget")
+                self.create_table_widget(rowPosition, 1, str(y.family), "net_addresses_tableWidget")
+                self.create_table_widget(rowPosition, 2, str(y.address), "net_addresses_tableWidget")
+                self.create_table_widget(rowPosition, 3, str(y.netmask), "net_addresses_tableWidget")
+                self.create_table_widget(rowPosition, 4, str(y.broadcast), "net_addresses_tableWidget")
+                self.create_table_widget(rowPosition, 4, str(y.ptp), "net_addresses_tableWidget")
+
+        # Net connections
+        for x in psutil.net_connections():
+            z = psutil.net_connections()
+
+            rowPosition = self.ui.net_connections_tableWidget.rowCount()
+            self.ui.net_connections_tableWidget.insertRow(rowPosition)
+
+            self.create_table_widget(rowPosition, 0, str(x.fd), "net_connections_tableWidget")
+            self.create_table_widget(rowPosition, 1, str(x.family), "net_connections_tableWidget")
+            self.create_table_widget(rowPosition, 2, str(x.type), "net_connections_tableWidget")
+            self.create_table_widget(rowPosition, 3, str(x.laddr), "net_connections_tableWidget")
+            self.create_table_widget(rowPosition, 4, str(x.raddr), "net_connections_tableWidget")
+            self.create_table_widget(rowPosition, 5, str(x.status), "net_connections_tableWidget")
+            self.create_table_widget(rowPosition, 6, str(x.pid), "net_connections_tableWidget")
+
+    def storage(self):
+        global platforms
+        storage_device = psutil.disk_partitions(all=False)
+        z = 0
+        for x in storage_device:
+            rowPosition = self.ui.storage_tableWidget.rowCount()
+            self.ui.storage_tableWidget.insertRow(rowPosition)
+
+            self.create_table_widget(rowPosition, 0, x.device, "storage_tableWidget")
+            self.create_table_widget(rowPosition, 1, x.mountpoint, "storage_tableWidget")
+            self.create_table_widget(rowPosition, 2, x.fstype, "storage_tableWidget")
+            self.create_table_widget(rowPosition, 3, x.opts, "storage_tableWidget")
+
+            # if sys.platform == 'linux' or sys.platform == 'linux1' or sys.platform == 'linux2':
+            self.create_table_widget(rowPosition, 4, str(x.maxfile), "storage_tableWidget")
+            self.create_table_widget(rowPosition, 5, str(x.maxpath), "storage_tableWidget")
+            # else:
+            #     self.create_table_widget(rowPosition, 4, "Funktion nicht verfügbar auf " + platforms[sys.platform], "storage_tableWidget")
+            #     self.create_table_widget(rowPosition, 5, "Funktion nicht verfügbar auf " + platforms[sys.platform], "storage_tableWidget")
+
+            disk_usage = shutil.disk_usage(x.mountpoint)
+
+            self.create_table_widget(rowPosition, 6, str(round((disk_usage.total / (1024 * 1024 * 1024)), 2)) + " GB",
+                                     "storage_tableWidget")
+            self.create_table_widget(rowPosition, 7, str(round((disk_usage.used / (1024 * 1024 * 1024)), 2)) + " GB",
+                                     "storage_tableWidget")
+            self.create_table_widget(rowPosition, 8, str(round((disk_usage.free / (1024 * 1024 * 1024)), 2)) + " GB",
+                                     "storage_tableWidget")
+
+            full_disk = (disk_usage.used / disk_usage.total) * 100
+            progressBar = QProgressBar(self.ui.storage_tableWidget)
+            progressBar.setObjectName(u"progressBar")
+            progressBar.setValue(full_disk)
+            self.ui.storage_tableWidget.setCellWidget(rowPosition, 9, progressBar)
+
+    def create_table_widget(self, rowPosition, columnPosition, text, tableName):
+        qtablewidgetitem = QTableWidgetItem()
+
+        getattr(self.ui, tableName).setItem(rowPosition, columnPosition, qtablewidgetitem)
+        qtablewidgetitem = getattr(self.ui, tableName).item(rowPosition, columnPosition)
+
+        qtablewidgetitem.setText(text)
+
+    def processes(self):
+        for x in psutil.pids():
+            rowPosition = self.ui.activities_tableWidget.rowCount()
+            self.ui.activities_tableWidget.insertRow(rowPosition)
+
+            try:
+                process = psutil.Process(x)
+
+                self.create_table_widget(rowPosition, 0, str(process.pid), "activities_tableWidget")
+                self.create_table_widget(rowPosition, 1, process.name(), "activities_tableWidget")
+                self.create_table_widget(rowPosition, 2, process.status(), "activities_tableWidget")
+                self.create_table_widget(rowPosition, 3,
+                                         str(datetime.datetime.utcfromtimestamp(process.create_time()).strftime(
+                                             '%Y-%m-%d %H:%M:%S')), "activities_tableWidget")
+
+                suspend_btn = QPushButton(self.ui.activities_tableWidget)
+                suspend_btn.setText('Unterbrechen')
+                suspend_btn.setStyleSheet("color: brown")
+                self.ui.activities_tableWidget.setCellWidget(rowPosition, 4, suspend_btn)
+
+                resume_btn = QPushButton(self.ui.activities_tableWidget)
+                resume_btn.setText('Fortsetzen')
+                resume_btn.setStyleSheet("color: green")
+                self.ui.activities_tableWidget.setCellWidget(rowPosition, 5, resume_btn)
+
+                terminate_btn = QPushButton(self.ui.activities_tableWidget)
+                terminate_btn.setText('Beenden')
+                terminate_btn.setStyleSheet("color: orange")
+                self.ui.activities_tableWidget.setCellWidget(rowPosition, 6, terminate_btn)
+
+                kill_btn = QPushButton(self.ui.activities_tableWidget)
+                kill_btn.setText('Killen')
+                kill_btn.setStyleSheet("color: red")
+                self.ui.activities_tableWidget.setCellWidget(rowPosition, 7, kill_btn)
+
+            except Exception as e:
+                print(e)
+
+        self.ui.activity_search.textChanged.connect(self.findName)
+
+    def findName(self):
+        name = self.ui.activity_search.text().lower()
+        for row in range(self.ui.activities_tableWidget.rowCount()):
+            item = self.ui.activities_tableWidget.item(row, 1)
+            self.ui.activities_tableWidget.setRowHidden(row, name not in item.text().lower())
+
+    def system_info(self):
+        time = datetime.datetime.now().strftime("%H:%M:%S")
+        self.ui.system_time.setText(str(time))
+        date = datetime.datetime.now().strftime("%Y-%m-%d")
+        self.ui.system_date.setText(str(date))
+
+        self.ui.system_machine.setText(platform.machine())
+        self.ui.system_version.setText(platform.version())
+        self.ui.system_platform.setText(platform.platform())
+        self.ui.system_system.setText(platform.system())
+        self.ui.system_processor.setText(platform.processor())
+        self.ui.system_release.setText(platform.release())
 
     def cpu_ram(self):
 
@@ -87,7 +373,7 @@ class MainWindow(QMainWindow):
 
         self.ui.cpu_progress_bar.setRange(0, 100)
         self.ui.cpu_progress_bar.setValue(int(cpuPer))
-        self.ui.label_cpu_progress_bar.setText(str(cpuPer))
+        self.ui.label_cpu_progress_bar.setText(str(cpuPer) + " %")
 
         totalRam = 1.0
         totalRam = psutil.virtual_memory()[0] * totalRam
@@ -114,7 +400,7 @@ class MainWindow(QMainWindow):
 
         self.ui.ram_progress_bar.setRange(0, 100)
         self.ui.ram_progress_bar.setValue(int(psutil.virtual_memory()[2]))
-        self.ui.label_ram_progress_bar.setText(str(psutil.virtual_memory()[2]))
+        self.ui.label_ram_progress_bar.setText(str(psutil.virtual_memory()[2]) + " %")
 
     def secs2hours(self, secs):
         mm, ss = divmod(secs, 60)
