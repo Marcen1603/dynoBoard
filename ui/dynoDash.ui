@@ -1050,6 +1050,26 @@
                              </property>
                             </widget>
                            </item>
+                           <item>
+                            <widget class="QLabel" name="label_44">
+                             <property name="styleSheet">
+                              <string notr="true">color: rgb(255, 255, 255);</string>
+                             </property>
+                             <property name="text">
+                              <string>Ping (Google):</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QLabel" name="label_51">
+                             <property name="styleSheet">
+                              <string notr="true">color: rgb(255, 255, 255);</string>
+                             </property>
+                             <property name="text">
+                              <string>Ping (Deutsche Telekom):</string>
+                             </property>
+                            </widget>
+                           </item>
                           </layout>
                          </widget>
                         </item>
@@ -1129,6 +1149,26 @@
                            </item>
                            <item>
                             <widget class="QLabel" name="device_uptime_2">
+                             <property name="styleSheet">
+                              <string notr="true">color: rgb(255, 255, 255);</string>
+                             </property>
+                             <property name="text">
+                              <string>N/A</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QLabel" name="ping_google">
+                             <property name="styleSheet">
+                              <string notr="true">color: rgb(255, 255, 255);</string>
+                             </property>
+                             <property name="text">
+                              <string>N/A</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QLabel" name="ping_telekom">
                              <property name="styleSheet">
                               <string notr="true">color: rgb(255, 255, 255);</string>
                              </property>

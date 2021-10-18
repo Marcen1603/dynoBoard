@@ -3,9 +3,9 @@ import platform
 import shutil
 import sys
 import threading
-
 import psutil
 
+from ping3 import ping
 from PySide6 import QtGui, QtCore
 from PySide6.QtCore import QPropertyAnimation, QThreadPool
 from PySide6.QtGui import QColor, Qt
@@ -165,6 +165,9 @@ class MainWindow(QMainWindow):
 
         connected_devices = fwlan.host_number
         self.ui.connected_devices.setText(str(connected_devices))
+
+        self.ui.ping_google.setText(str(int(ping('www.google.de') * 1000)) + " ms")
+        self.ui.ping_telekom.setText(str(int(ping('t-online.de') * 1000)) + " ms")
 
     def call(self):
 
