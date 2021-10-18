@@ -7,12 +7,15 @@ import threading
 import psutil
 
 from PySide6 import QtGui, QtCore
-from PySide6.QtCore import QPropertyAnimation, QObject, QRunnable, QThreadPool, Signal, Slot, QTimer
+from PySide6.QtCore import QPropertyAnimation, QThreadPool
 from PySide6.QtGui import QColor, Qt
 from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsDropShadowEffect, QSizeGrip, QPushButton, \
     QTableWidgetItem, QProgressBar
-
-from apscheduler.schedulers.background import BackgroundScheduler
+from fritzconnection import FritzConnection
+from fritzconnection.lib.fritzcall import FritzCall
+from fritzconnection.lib.fritzhomeauto import FritzHomeAutomation
+from fritzconnection.lib.fritzstatus import FritzStatus
+from fritzconnection.lib.fritzwlan import FritzWLAN
 
 from ui.ui_dynoDash import Ui_MainWindow
 
@@ -26,39 +29,6 @@ platforms = {
     'darwin': 'OS X',
     'win32': 'Windows'
 }
-
-
-# class WorkerSignals(QObject):
-#     finished = Signal()
-#     error = Signal(tuple)
-#     result = Signal(object)
-#     progress = Signal(int)
-#
-#
-# class Worker(QRunnable):
-#
-#     def __init__(self, fn, *args, **kwargs):
-#         super(Worker, self).__init__()
-#
-#         self.fn = fn
-#         self.args = args
-#         self.kwargs = kwargs
-#         self.signals = WorkerSignals()
-#
-#         self.kwargs['progress_callback'] = self.signals.progress
-#
-#     @Slot
-#     def run(self):
-#         try:
-#             result = self.fn(*self.args, **self.kwargs)
-#         except:
-#             traceback.print_exc()
-#             exctype, value = sys, sys.exc_info()[:2]
-#             self.signals.error.emit((exctype, value, traceback.format_exc()))
-#         else:
-#             self.signals.result.emit(result)
-#         finally:
-#             self.signals.finished.emit()
 
 
 class MainWindow(QMainWindow):
@@ -125,6 +95,8 @@ class MainWindow(QMainWindow):
 
         self.show()
 
+        self.internet()
+        self.call()
         self.cpu_ram()
         self.system_info()
         self.processes()
@@ -132,38 +104,112 @@ class MainWindow(QMainWindow):
         self.sensors()
         self.networks()
 
-        # sched = BackgroundScheduler()
-        # sched.add_job(self.cpu_ram, 'interval', seconds=2)
-        # sched.start()
-
-        import threading
+        self.update()
 
         def looper():
             # i as interval in seconds
             threading.Timer(1, looper).start()
             # put your action here
             self.cpu_ram()
+            self.internet()
 
         # to start
         looper()
 
-    # def dyno_thread(self):
-    #     worker = Worker(self.cpu_ram())
-    #
-    #     worker.signals.result.connect(self.print_output)
-    #     worker.signals.finished.connect(self.thread_complete)
-    #     worker.signals.progress.connect(self.progress_fn)
-    #
-    #     self.threadpool.start(worker)
+    def internet(self):
 
-    # def print_output(self, s):
-    #     print(s)
-    #
-    # def thread_complete(self):
-    #     print("Thread complete!")
-    #
-    # def progress_fn(self, n):
-    #     print("%d%% done" % n)
+        fc = FritzConnection(address='192.168.178.1', password="jogger2285")
+        fstatus = FritzStatus(fc)
+        fwlan = FritzWLAN(fc)
+
+        # Status
+        total_bytes_received = round((fstatus.bytes_received / 1024 / 1024 / 1024), 2)
+        self.ui.total_bytes_received_2.setText(str(total_bytes_received) + " GB")
+
+        total_bytes_sent = round((fstatus.bytes_sent / 1024 / 1024 / 1024), 2)
+        self.ui.total_bytes_sent_2.setText(str(total_bytes_sent) + " GB")
+
+        connection_uptime = self.to_day_min_sec(fstatus.connection_uptime)
+        self.ui.connection_uptime_2.setText(str(connection_uptime))
+
+        device_uptime = self.to_day_min_sec(fstatus.device_uptime)
+        self.ui.device_uptime_2.setText(str(device_uptime))
+
+        external_ip_v4 = fstatus.external_ip
+        self.ui.external_ip_v4_2.setText(str(external_ip_v4))
+
+        external_ip_v6 = fstatus.external_ipv6
+        self.ui.external_ip_v6_2.setText(str(external_ip_v6))
+
+        is_connected = fstatus.is_connected
+        self.ui.is_connected_2.setText(str(is_connected))
+
+        is_linked = fstatus.is_linked
+        self.ui.is_linked_2.setText(str(is_linked))
+
+        max_upload = fstatus.str_max_bit_rate[0]
+        self.ui.max_upload_2.setText(str(max_upload))
+
+        max_download = fstatus.str_max_bit_rate[1]
+        self.ui.max_download_2.setText(str(max_download))
+
+        current_upload = fstatus.str_transmission_rate[0]
+        self.ui.current_upload_2.setText(str(current_upload))
+
+        current_download = fstatus.str_transmission_rate[1]
+        self.ui.current_download_2.setText(str(current_download))
+
+        # W-Lan
+        ssid = fwlan.ssid
+        self.ui.ssid.setText(str(ssid))
+
+        connected_devices = fwlan.host_number
+        self.ui.connected_devices.setText(str(connected_devices))
+
+    def call(self):
+
+        call_types = {
+            "0": 'ALL_CALL_TYPES',
+            "1": 'Eingehend',
+            "2": 'Verpasst',
+            "3": 'Ausgehend',
+            "9": 'Aktiv eingehend',
+            "10": 'Abgelehnt',
+            "11": 'Aktib ausgehend',
+        }
+
+        fc = FritzConnection(address='192.168.178.1', password="jogger2285")
+        fcall = FritzCall(fc)
+
+        last_10_call = fcall.get_calls(calltype=0, update=True, num=10, days=None)
+
+        for call in last_10_call:
+            call_entry = str(call).split()
+            call_type = call_types[call_entry[0]]
+            call_number = call_entry[1]
+            call_date = call_entry[2] + " - " + call_entry[3]
+            call_duration = call_entry[4]
+
+            rowPosition = self.ui.call_tableWidget.rowCount()
+            self.ui.call_tableWidget.insertRow(rowPosition)
+
+            self.create_table_widget(rowPosition, 0, str(call_type), "call_tableWidget")
+            self.create_table_widget(rowPosition, 1, str(call_number), "call_tableWidget")
+            self.create_table_widget(rowPosition, 2, str(call_date), "call_tableWidget")
+            self.create_table_widget(rowPosition, 3, str(call_duration), "call_tableWidget")
+
+    def to_day_min_sec(self, sec):
+        seconds = sec
+        seconds_in_day = 60 * 60 * 24
+        seconds_in_hour = 60 * 60
+        seconds_in_minute = 60
+
+        days = seconds // seconds_in_day
+        hours = (seconds - (days * seconds_in_day)) // seconds_in_hour
+        minutes = (seconds - (days * seconds_in_day) - (hours * seconds_in_hour)) // seconds_in_minute
+
+        return str(days) + " Tage " + str(hours) + " Stunden " + str(minutes) + " Minuten"
+
 
     def sensors(self):
         if sys.platform == 'linux' or sys.platform == 'linux1' or sys.platform == 'linux2':
@@ -367,13 +413,10 @@ class MainWindow(QMainWindow):
 
         cpuPer = psutil.cpu_percent()
         self.ui.cpu_per.setText(str(cpuPer) + ' %')
+        self.ui.cpu_percent_large.setText(str(cpuPer) + '%')
 
         cpuMainCore = psutil.cpu_count(logical=False)
         self.ui.cpu_main_core.setText(str(cpuMainCore))
-
-        self.ui.cpu_progress_bar.setRange(0, 100)
-        self.ui.cpu_progress_bar.setValue(int(cpuPer))
-        self.ui.label_cpu_progress_bar.setText(str(cpuPer) + " %")
 
         totalRam = 1.0
         totalRam = psutil.virtual_memory()[0] * totalRam
@@ -395,12 +438,8 @@ class MainWindow(QMainWindow):
         ramFree = ramFree / (1024 * 1024 * 1024)
         self.ui.free_ram.setText(str("{:.4f}".format(ramFree) + ' GB'))
 
-        ramUsage = str(psutil.virtual_memory()[2]) + '%'
-        self.ui.ram_usage.setText(str("{:.4f}").format(totalRam) + ' GB')
-
-        self.ui.ram_progress_bar.setRange(0, 100)
-        self.ui.ram_progress_bar.setValue(int(psutil.virtual_memory()[2]))
-        self.ui.label_ram_progress_bar.setText(str(psutil.virtual_memory()[2]) + " %")
+        self.ui.ram_usage.setText(str(psutil.virtual_memory()[2]) + " %")
+        self.ui.ram_percent_large.setText(str(psutil.virtual_memory()[2]) + "%")
 
     def secs2hours(self, secs):
         mm, ss = divmod(secs, 60)
