@@ -1,5 +1,9 @@
 <RCC>
   <qresource prefix="images">
+    <file>ui_images/get_app_white_36dp_colored.svg</file>
+    <file>ui_images/Google__G__Logo.svg</file>
+    <file>ui_images/Telekom_Logo_2013.svg</file>
+    <file>ui_images/upload_white_36dp_colored.svg</file>
     <file>ui_images/get_app_white_36dp.svg</file>
     <file>ui_images/upload_white_36dp.svg</file>
     <file>ui_images/search_white_36dp.svg</file>

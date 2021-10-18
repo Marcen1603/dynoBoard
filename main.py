@@ -13,7 +13,6 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsDropShadowEffe
     QTableWidgetItem, QProgressBar
 from fritzconnection import FritzConnection
 from fritzconnection.lib.fritzcall import FritzCall
-from fritzconnection.lib.fritzhomeauto import FritzHomeAutomation
 from fritzconnection.lib.fritzstatus import FritzStatus
 from fritzconnection.lib.fritzwlan import FritzWLAN
 
@@ -95,6 +94,7 @@ class MainWindow(QMainWindow):
 
         self.show()
 
+        self.overview()
         self.internet()
         self.call()
         self.cpu_ram()
@@ -112,9 +112,31 @@ class MainWindow(QMainWindow):
             # put your action here
             self.cpu_ram()
             self.internet()
-
+            self.overview()
         # to start
         looper()
+
+    def overview(self):
+
+        # System
+        self.ui.overview_system_system.setText(str(platform.system()) + " " + str(platform.release()))
+        self.ui.overview_system_version.setText(str(platform.version()))
+
+        time = datetime.datetime.now().strftime("%H:%M:%S")
+        date = datetime.datetime.now().strftime("%Y-%m-%d")
+        self.ui.overview_system_date_time.setText(date + " | " + time)
+
+        # CPU & RAM
+        self.ui.overview_cpu.setText(str(psutil.cpu_percent()) + " %")
+        self.ui.overview_ram.setText(str(psutil.virtual_memory()[2]) + " %")
+
+        # Internet
+        fc = FritzConnection(address='192.168.178.1', password="jogger2285")
+        fstatus = FritzStatus(fc)
+        self.ui.overview_current_download.setText(str(fstatus.str_transmission_rate[1]))
+        self.ui.overview_current_upload.setText(str(fstatus.str_transmission_rate[0]))
+        self.ui.overview_google_ping.setText(str(int(ping('www.google.de') * 1000)) + " ms")
+        self.ui.overview_telekom_ping.setText(str(int(ping('t-online.de') * 1000)) + " ms")
 
     def internet(self):
 
@@ -212,7 +234,6 @@ class MainWindow(QMainWindow):
         minutes = (seconds - (days * seconds_in_day) - (hours * seconds_in_hour)) // seconds_in_minute
 
         return str(days) + " Tage " + str(hours) + " Stunden " + str(minutes) + " Minuten"
-
 
     def sensors(self):
         if sys.platform == 'linux' or sys.platform == 'linux1' or sys.platform == 'linux2':
@@ -491,6 +512,7 @@ class MainWindow(QMainWindow):
 
 
 if __name__ == "__main__":
+
     app = QApplication(sys.argv)
 
     window = MainWindow()

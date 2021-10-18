@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="logo">
+    <file>logo/logo_small.svg</file>
     <file>logo/analytics_white_36dp.svg</file>
     <file>logo/favicon.png</file>
     <file>logo/logo.png</file>
