@@ -785,7 +785,7 @@ class Ui_MainWindow(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollAreaWidgetContents_5 = QWidget()
         self.scrollAreaWidgetContents_5.setObjectName(u"scrollAreaWidgetContents_5")
-        self.scrollAreaWidgetContents_5.setGeometry(QRect(0, 0, 944, 510))
+        self.scrollAreaWidgetContents_5.setGeometry(QRect(0, 0, 440, 510))
         self.verticalLayout_47 = QVBoxLayout(self.scrollAreaWidgetContents_5)
         self.verticalLayout_47.setSpacing(0)
         self.verticalLayout_47.setObjectName(u"verticalLayout_47")
@@ -1952,7 +1952,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 155, 819))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 926, 819))
         self.verticalLayout_15 = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_15.setSpacing(5)
         self.verticalLayout_15.setObjectName(u"verticalLayout_15")
@@ -2267,6 +2267,114 @@ class Ui_MainWindow(object):
         self.stackedWidget.addWidget(self.activity_page)
         self.settings_page = QWidget()
         self.settings_page.setObjectName(u"settings_page")
+        self.verticalLayout_54 = QVBoxLayout(self.settings_page)
+        self.verticalLayout_54.setObjectName(u"verticalLayout_54")
+        self.frame_86 = QFrame(self.settings_page)
+        self.frame_86.setObjectName(u"frame_86")
+        self.frame_86.setFrameShape(QFrame.StyledPanel)
+        self.frame_86.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_46 = QHBoxLayout(self.frame_86)
+        self.horizontalLayout_46.setSpacing(0)
+        self.horizontalLayout_46.setObjectName(u"horizontalLayout_46")
+        self.horizontalLayout_46.setContentsMargins(0, 0, 0, 0)
+        self.label_41 = QLabel(self.frame_86)
+        self.label_41.setObjectName(u"label_41")
+        self.label_41.setFont(font3)
+        self.label_41.setStyleSheet(u"color: rgb(255, 255, 255);")
+
+        self.horizontalLayout_46.addWidget(self.label_41)
+
+
+        self.verticalLayout_54.addWidget(self.frame_86)
+
+        self.frame_87 = QFrame(self.settings_page)
+        self.frame_87.setObjectName(u"frame_87")
+        sizePolicy2.setHeightForWidth(self.frame_87.sizePolicy().hasHeightForWidth())
+        self.frame_87.setSizePolicy(sizePolicy2)
+        self.frame_87.setFrameShape(QFrame.StyledPanel)
+        self.frame_87.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_55 = QVBoxLayout(self.frame_87)
+        self.verticalLayout_55.setSpacing(0)
+        self.verticalLayout_55.setObjectName(u"verticalLayout_55")
+        self.verticalLayout_55.setContentsMargins(0, 0, 0, 0)
+        self.frame_85 = QFrame(self.frame_87)
+        self.frame_85.setObjectName(u"frame_85")
+        self.frame_85.setFocusPolicy(Qt.StrongFocus)
+        self.frame_85.setFrameShape(QFrame.StyledPanel)
+        self.frame_85.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_56 = QVBoxLayout(self.frame_85)
+        self.verticalLayout_56.setSpacing(0)
+        self.verticalLayout_56.setObjectName(u"verticalLayout_56")
+        self.verticalLayout_56.setContentsMargins(0, 0, 0, 0)
+        self.frame_88 = QFrame(self.frame_85)
+        self.frame_88.setObjectName(u"frame_88")
+        self.frame_88.setFrameShape(QFrame.StyledPanel)
+        self.frame_88.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_57 = QVBoxLayout(self.frame_88)
+        self.verticalLayout_57.setSpacing(0)
+        self.verticalLayout_57.setObjectName(u"verticalLayout_57")
+        self.verticalLayout_57.setContentsMargins(0, 0, 0, 9)
+        self.label_66 = QLabel(self.frame_88)
+        self.label_66.setObjectName(u"label_66")
+        self.label_66.setFont(font4)
+        self.label_66.setStyleSheet(u"color: rgb(255, 255, 255);")
+
+        self.verticalLayout_57.addWidget(self.label_66)
+
+
+        self.verticalLayout_56.addWidget(self.frame_88)
+
+        self.frame_90 = QFrame(self.frame_85)
+        self.frame_90.setObjectName(u"frame_90")
+        sizePolicy2.setHeightForWidth(self.frame_90.sizePolicy().hasHeightForWidth())
+        self.frame_90.setSizePolicy(sizePolicy2)
+        self.frame_90.setFrameShape(QFrame.StyledPanel)
+        self.frame_90.setFrameShadow(QFrame.Raised)
+        self.internet_password_display = QLineEdit(self.frame_90)
+        self.internet_password_display.setObjectName(u"internet_password_display")
+        self.internet_password_display.setGeometry(QRect(0, 0, 250, 40))
+        self.internet_password_display.setStyleSheet(u"background-color: rgb(30, 30, 30);\n"
+"color: rgb(255, 255, 255);")
+        self.internet_password_display.setEchoMode(QLineEdit.Password)
+        self.internet_password_display.setReadOnly(True)
+        self.show_internet_password = QPushButton(self.frame_90)
+        self.show_internet_password.setObjectName(u"show_internet_password")
+        self.show_internet_password.setGeometry(QRect(280, 0, 141, 40))
+        self.show_internet_password.setStyleSheet(u"border: 1px solid;\n"
+"border-color: rgb(0, 255, 255);")
+        self.internet_password = QLineEdit(self.frame_90)
+        self.internet_password.setObjectName(u"internet_password")
+        self.internet_password.setGeometry(QRect(0, 50, 250, 40))
+        self.internet_password.setFont(font2)
+        self.internet_password.setStyleSheet(u"background-color: rgb(30, 30, 30);\n"
+"color: rgb(255, 255, 255);")
+        self.internet_password.setEchoMode(QLineEdit.Password)
+        self.save_internet_password = QPushButton(self.frame_90)
+        self.save_internet_password.setObjectName(u"save_internet_password")
+        self.save_internet_password.setGeometry(QRect(280, 50, 111, 40))
+        self.save_internet_password.setStyleSheet(u"border: 1px solid;\n"
+"border-color: rgb(0, 255, 255);")
+        self.clear_internet_password = QPushButton(self.frame_90)
+        self.clear_internet_password.setObjectName(u"clear_internet_password")
+        self.clear_internet_password.setGeometry(QRect(430, 0, 101, 40))
+        self.clear_internet_password.setStyleSheet(u"border: 1px solid;\n"
+"border-color: rgb(0, 255, 255);")
+
+        self.verticalLayout_56.addWidget(self.frame_90)
+
+
+        self.verticalLayout_55.addWidget(self.frame_85)
+
+        self.frame_89 = QFrame(self.frame_87)
+        self.frame_89.setObjectName(u"frame_89")
+        self.frame_89.setFrameShape(QFrame.StyledPanel)
+        self.frame_89.setFrameShadow(QFrame.Raised)
+
+        self.verticalLayout_55.addWidget(self.frame_89)
+
+
+        self.verticalLayout_54.addWidget(self.frame_87)
+
         self.stackedWidget.addWidget(self.settings_page)
 
         self.verticalLayout_3.addWidget(self.stackedWidget)
@@ -2335,7 +2443,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(8)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -2575,6 +2683,12 @@ class Ui_MainWindow(object):
         self.pushButton_4.setText(QCoreApplication.translate("MainWindow", u"Fortsetzen", None))
         self.pushButton_5.setText(QCoreApplication.translate("MainWindow", u"Beenden", None))
         self.pushButton_6.setText(QCoreApplication.translate("MainWindow", u"Killen", None))
+        self.label_41.setText(QCoreApplication.translate("MainWindow", u"Einstellungen", None))
+        self.label_66.setText(QCoreApplication.translate("MainWindow", u"Internet Passwort", None))
+        self.show_internet_password.setText(QCoreApplication.translate("MainWindow", u"Zeigen/Verstecken", None))
+        self.internet_password.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Passwort", None))
+        self.save_internet_password.setText(QCoreApplication.translate("MainWindow", u"Speichern", None))
+        self.clear_internet_password.setText(QCoreApplication.translate("MainWindow", u"L\u00f6schen", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Version 0.1 | Copyright Marcel Peplies", None))
         self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
     # retranslateUi

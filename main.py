@@ -1,21 +1,23 @@
 import datetime
 import platform
 import shutil
+import string
 import sys
 import threading
 import psutil
 
 from ping3 import ping
 from PySide6 import QtGui, QtCore
-from PySide6.QtCore import QPropertyAnimation, QThreadPool
+from PySide6.QtCore import QPropertyAnimation, QSettings
 from PySide6.QtGui import QColor, Qt
 from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsDropShadowEffect, QSizeGrip, QPushButton, \
-    QTableWidgetItem, QProgressBar
+    QTableWidgetItem, QProgressBar, QLineEdit
 from fritzconnection import FritzConnection
 from fritzconnection.lib.fritzcall import FritzCall
 from fritzconnection.lib.fritzstatus import FritzStatus
 from fritzconnection.lib.fritzwlan import FritzWLAN
 
+from pages.setup import setup
 from ui.ui_dynoDash import Ui_MainWindow
 
 # Import Qt-Material
@@ -29,51 +31,17 @@ platforms = {
     'win32': 'Windows'
 }
 
+correct_internet_password = True
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-
         qt_material.apply_stylesheet(app, theme="dark_cyan.xml")
 
-        self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_TranslucentBackground)
-
-        self.shadow = QGraphicsDropShadowEffect(self)
-        self.shadow.setBlurRadius(50)
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
-        self.shadow.setColor(QColor(0, 92, 157, 550))
-
-        self.ui.centralwidget.setGraphicsEffect(self.shadow)
-
-        self.setWindowIcon(QtGui.QIcon("images/logo/logo_photoshoped.png"))
-        self.setWindowTitle("DynoDashboard")
-
-        # Minimize window
-        self.ui.minimize_window_button.clicked.connect(lambda: self.showMinimized())
-
-        # Close window
-        self.ui.close_winow_button.clicked.connect(lambda: self.close())
-
-        # Restore/maximize window
-        self.ui.restore_window_button.clicked.connect(lambda: self.restore_or_maximize_window())
-
-        # Navigate to pages
-        self.ui.overview_button.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.overview_page))
-        self.ui.internet_button.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.internet_page))
-        self.ui.computer_button.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.computer_page))
-        self.ui.system_info_button.clicked.connect(
-            lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.system_info_page))
-        self.ui.storage_button.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.storage_page))
-        self.ui.sensor_button.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.sensor_page))
-        self.ui.network_button.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.network_page))
-        self.ui.settings_button.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.settings_page))
-        self.ui.activity_button.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.activity_page))
-
-        QSizeGrip(self.ui.size_grip)
+        self = setup(self)
 
         # Function to move the window, because the window is borderless
         def moveWindow(e):
@@ -89,9 +57,6 @@ class MainWindow(QMainWindow):
         for w in self.ui.menu_frame.findChildren(QPushButton):
             w.clicked.connect(self.applyButtonStyle)
 
-        # Start thread
-        self.threadpool = QThreadPool()
-
         self.show()
 
         self.overview()
@@ -103,6 +68,7 @@ class MainWindow(QMainWindow):
         self.storage()
         self.sensors()
         self.networks()
+        self.load_internet_password()
 
         self.update()
 
@@ -113,8 +79,30 @@ class MainWindow(QMainWindow):
             self.cpu_ram()
             self.internet()
             self.overview()
+
         # to start
         looper()
+
+    def clear_internet_password(self):
+        self.ui.internet_password_display.clear()
+
+    def load_internet_password(self):
+        settings = QtCore.QSettings("DynoDashboard", "Settings")
+        self.ui.internet_password_display.setText(settings.value('internet_password'))
+
+    def save_internet_password(self):
+        global correct_internet_password
+        settings = QtCore.QSettings("DynoDashboard", "Settings")
+        settings.setValue("internet_password", self.ui.internet_password.text())
+        self.ui.internet_password_display.setText(self.ui.internet_password.text())
+        self.ui.internet_password.clear()
+        correct_internet_password = True
+
+    def show_hide_internet_password(self):
+        if self.ui.internet_password_display.echoMode() == QLineEdit.EchoMode.Password:
+            self.ui.internet_password_display.setEchoMode(QLineEdit.EchoMode.Normal)
+        else:
+            self.ui.internet_password_display.setEchoMode(QLineEdit.EchoMode.Password)
 
     def overview(self):
 
@@ -131,65 +119,72 @@ class MainWindow(QMainWindow):
         self.ui.overview_ram.setText(str(psutil.virtual_memory()[2]) + " %")
 
         # Internet
-        fc = FritzConnection(address='192.168.178.1', password="jogger2285")
-        fstatus = FritzStatus(fc)
-        self.ui.overview_current_download.setText(str(fstatus.str_transmission_rate[1]))
-        self.ui.overview_current_upload.setText(str(fstatus.str_transmission_rate[0]))
-        self.ui.overview_google_ping.setText(str(int(ping('www.google.de') * 1000)) + " ms")
-        self.ui.overview_telekom_ping.setText(str(int(ping('t-online.de') * 1000)) + " ms")
+        if self.ui.internet_password_display.text() != "":
+            fc = FritzConnection(address='192.168.178.1', password=self.ui.internet_password_display.text())
+            fstatus = FritzStatus(fc)
+            self.ui.overview_current_download.setText(str(fstatus.str_transmission_rate[1]))
+            self.ui.overview_current_upload.setText(str(fstatus.str_transmission_rate[0]))
+            self.ui.overview_google_ping.setText(str(int(ping('www.google.de') * 1000)) + " ms")
+            self.ui.overview_telekom_ping.setText(str(int(ping('t-online.de') * 1000)) + " ms")
 
     def internet(self):
+        global correct_internet_password
 
-        fc = FritzConnection(address='192.168.178.1', password="jogger2285")
-        fstatus = FritzStatus(fc)
-        fwlan = FritzWLAN(fc)
+        if correct_internet_password is True:
+            try:
+                fc = FritzConnection(address='192.168.178.1', password=self.ui.internet_password_display.text())
+                fstatus = FritzStatus(fc)
+                fwlan = FritzWLAN(fc)
 
-        # Status
-        total_bytes_received = round((fstatus.bytes_received / 1024 / 1024 / 1024), 2)
-        self.ui.total_bytes_received_2.setText(str(total_bytes_received) + " GB")
+                # Status
+                total_bytes_received = round((fstatus.bytes_received / 1024 / 1024 / 1024), 2)
+                self.ui.total_bytes_received_2.setText(str(total_bytes_received) + " GB")
 
-        total_bytes_sent = round((fstatus.bytes_sent / 1024 / 1024 / 1024), 2)
-        self.ui.total_bytes_sent_2.setText(str(total_bytes_sent) + " GB")
+                total_bytes_sent = round((fstatus.bytes_sent / 1024 / 1024 / 1024), 2)
+                self.ui.total_bytes_sent_2.setText(str(total_bytes_sent) + " GB")
 
-        connection_uptime = self.to_day_min_sec(fstatus.connection_uptime)
-        self.ui.connection_uptime_2.setText(str(connection_uptime))
+                connection_uptime = self.to_day_min_sec(fstatus.connection_uptime)
+                self.ui.connection_uptime_2.setText(str(connection_uptime))
 
-        device_uptime = self.to_day_min_sec(fstatus.device_uptime)
-        self.ui.device_uptime_2.setText(str(device_uptime))
+                device_uptime = self.to_day_min_sec(fstatus.device_uptime)
+                self.ui.device_uptime_2.setText(str(device_uptime))
 
-        external_ip_v4 = fstatus.external_ip
-        self.ui.external_ip_v4_2.setText(str(external_ip_v4))
+                external_ip_v4 = fstatus.external_ip
+                self.ui.external_ip_v4_2.setText(str(external_ip_v4))
 
-        external_ip_v6 = fstatus.external_ipv6
-        self.ui.external_ip_v6_2.setText(str(external_ip_v6))
+                external_ip_v6 = fstatus.external_ipv6
+                self.ui.external_ip_v6_2.setText(str(external_ip_v6))
 
-        is_connected = fstatus.is_connected
-        self.ui.is_connected_2.setText(str(is_connected))
+                is_connected = fstatus.is_connected
+                self.ui.is_connected_2.setText(str(is_connected))
 
-        is_linked = fstatus.is_linked
-        self.ui.is_linked_2.setText(str(is_linked))
+                is_linked = fstatus.is_linked
+                self.ui.is_linked_2.setText(str(is_linked))
 
-        max_upload = fstatus.str_max_bit_rate[0]
-        self.ui.max_upload_2.setText(str(max_upload))
+                max_upload = fstatus.str_max_bit_rate[0]
+                self.ui.max_upload_2.setText(str(max_upload))
 
-        max_download = fstatus.str_max_bit_rate[1]
-        self.ui.max_download_2.setText(str(max_download))
+                max_download = fstatus.str_max_bit_rate[1]
+                self.ui.max_download_2.setText(str(max_download))
 
-        current_upload = fstatus.str_transmission_rate[0]
-        self.ui.current_upload_2.setText(str(current_upload))
+                current_upload = fstatus.str_transmission_rate[0]
+                self.ui.current_upload_2.setText(str(current_upload))
 
-        current_download = fstatus.str_transmission_rate[1]
-        self.ui.current_download_2.setText(str(current_download))
+                current_download = fstatus.str_transmission_rate[1]
+                self.ui.current_download_2.setText(str(current_download))
 
-        # W-Lan
-        ssid = fwlan.ssid
-        self.ui.ssid.setText(str(ssid))
+                # W-Lan
+                ssid = fwlan.ssid
+                self.ui.ssid.setText(str(ssid))
 
-        connected_devices = fwlan.host_number
-        self.ui.connected_devices.setText(str(connected_devices))
+                connected_devices = fwlan.host_number
+                self.ui.connected_devices.setText(str(connected_devices))
 
-        self.ui.ping_google.setText(str(int(ping('www.google.de') * 1000)) + " ms")
-        self.ui.ping_telekom.setText(str(int(ping('t-online.de') * 1000)) + " ms")
+                self.ui.ping_google.setText(str(int(ping('www.google.de') * 1000)) + " ms")
+                self.ui.ping_telekom.setText(str(int(ping('t-online.de') * 1000)) + " ms")
+
+            except Exception as e:
+                correct_internet_password = False
 
     def call(self):
 
@@ -203,25 +198,26 @@ class MainWindow(QMainWindow):
             "11": 'Aktib ausgehend',
         }
 
-        fc = FritzConnection(address='192.168.178.1', password="jogger2285")
-        fcall = FritzCall(fc)
+        if self.ui.internet_password_display.text() != "":
+            fc = FritzConnection(address='192.168.178.1', password="jogger2285")
+            fcall = FritzCall(fc)
 
-        last_10_call = fcall.get_calls(calltype=0, update=True, num=10, days=None)
+            last_10_call = fcall.get_calls(calltype=0, update=True, num=10, days=None)
 
-        for call in last_10_call:
-            call_entry = str(call).split()
-            call_type = call_types[call_entry[0]]
-            call_number = call_entry[1]
-            call_date = call_entry[2] + " - " + call_entry[3]
-            call_duration = call_entry[4]
+            for call in last_10_call:
+                call_entry = str(call).split()
+                call_type = call_types[call_entry[0]]
+                call_number = call_entry[1]
+                call_date = call_entry[2] + " - " + call_entry[3]
+                call_duration = call_entry[4]
 
-            rowPosition = self.ui.call_tableWidget.rowCount()
-            self.ui.call_tableWidget.insertRow(rowPosition)
+                rowPosition = self.ui.call_tableWidget.rowCount()
+                self.ui.call_tableWidget.insertRow(rowPosition)
 
-            self.create_table_widget(rowPosition, 0, str(call_type), "call_tableWidget")
-            self.create_table_widget(rowPosition, 1, str(call_number), "call_tableWidget")
-            self.create_table_widget(rowPosition, 2, str(call_date), "call_tableWidget")
-            self.create_table_widget(rowPosition, 3, str(call_duration), "call_tableWidget")
+                self.create_table_widget(rowPosition, 0, str(call_type), "call_tableWidget")
+                self.create_table_widget(rowPosition, 1, str(call_number), "call_tableWidget")
+                self.create_table_widget(rowPosition, 2, str(call_date), "call_tableWidget")
+                self.create_table_widget(rowPosition, 3, str(call_duration), "call_tableWidget")
 
     def to_day_min_sec(self, sec):
         seconds = sec
@@ -512,7 +508,6 @@ class MainWindow(QMainWindow):
 
 
 if __name__ == "__main__":
-
     app = QApplication(sys.argv)
 
     window = MainWindow()
